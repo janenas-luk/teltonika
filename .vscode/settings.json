@@ -6,6 +6,9 @@
         "GYVENTOJŲ",
         "hoverable",
         "KODAS",
+        "MIESTAI",
+        "MIESTO",
+        "PAŠTO",
         "PAVADINIMAS",
         "PLOTAS",
         "plussign",
@@ -13,6 +16,7 @@
         "ŠALYS",
         "SKAIČIUS",
         "UŽIMAMAS",
-        "VEIKSMAI"
+        "VEIKSMAI",
+        "vuejs"
     ]
 }

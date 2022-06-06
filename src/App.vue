@@ -2,24 +2,14 @@
   <div>
     <div class="nav-bar"></div>
     <div id="app" class="app">
-      <Countries />
+      <router-view></router-view>
     </div>
-    <div><Pagination /></div>
   </div>
 </template>
 
 <script>
-import Countries from "./components/Countries.vue";
-import Pagination from "./components/Pagination.vue";
-// import Cities from "./components/Cities.vue";
-
 export default {
-  name: "app",
-  components: {
-    Countries,
-    Pagination
-    // Cities
-  }
+  name: "app"
 };
 </script>
 

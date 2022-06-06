@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Name name="ŠALYS" />
+    <Name name="MIESTAI" />
     <Search />
     <div class="border">
       <table class="table is-hoverable">
@@ -9,20 +9,18 @@
             <th><abbr title="Position">PAVADINIMAS</abbr></th>
             <th><abbr title="Played">UŽIMAMAS PLOTAS</abbr></th>
             <th><abbr title="Won">GYVENTOJŲ SKAIČIUS</abbr></th>
-            <th><abbr title="Drawn">ŠALIES TEL. KODAS</abbr></th>
+            <th><abbr title="Drawn">MIESTO PAŠTO KODAS</abbr></th>
             <th><abbr title="Lost">VEIKSMAI</abbr></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="country in countries.data" v-bind:key="country.id">
+          <tr v-for="city in cities.data" v-bind:key="city.id">
             <td>
-              <router-link :to="{ name: 'cities', params: { id: country.id } }">
-                {{ country.attributes.name }}
-              </router-link>
+              {{ city.attributes.name }}
             </td>
-            <td>{{ country.attributes.area }}</td>
-            <td>{{ country.attributes.population }}</td>
-            <td>{{ country.attributes.phone_code }}</td>
+            <td>{{ city.attributes.area }}</td>
+            <td>{{ city.attributes.population }}</td>
+            <td>{{ city.attributes.postal_code }}</td>
 
             <td>Delete | Edit</td>
           </tr>
@@ -30,11 +28,11 @@
       </table>
     </div>
 
-    <nav class="pagination is-centered is-small">
+    <nav class="pagination is-centered is-small" v-if="cities.data.length > 10">
       <ul class="pagination-list">
-        <li v-for="link in countries.meta.links" :key="link.label">
+        <li v-for="link in cities.meta.links" :key="link.label">
           <a
-            @click="setPageNumber(link.url.slice(-1))"
+            @click="setCityPage(link.url.slice(-1))"
             class="pagination-link"
             :class="{ 'is-current': link.active }"
             aria-label="Goto page"
@@ -52,7 +50,7 @@ import Search from "../common/Search.vue";
 import axios from "axios";
 
 export default {
-  name: "Countries",
+  name: "Cities",
   components: {
     Name,
     Search
@@ -60,31 +58,34 @@ export default {
 
   data() {
     return {
-      countries: [],
+      cities: [],
+      cityNumber: this.$route.params.id,
       pageNumber: 1
     };
   },
 
   methods: {
-    getCountries() {
+    getCities() {
       try {
         const response = axios
           .get(
-            "https://akademija.teltonika.lt\/countries_api\/api\/countries?page=" +
+            "https://akademija.teltonika.lt\/countries_api\/api\/countries/" +
+              this.cityNumber +
+              "/cities?page=" +
               this.pageNumber
           )
-          .then(response => (this.countries = response.data));
+          .then(response => (this.cities = response.data));
       } catch (error) {
         console.log(error);
       }
     },
-    setPageNumber(value) {
+    setCityPage(value) {
       this.pageNumber = value;
-      this.getCountries();
+      this.getCities();
     }
   },
   created() {
-    this.getCountries();
+    this.getCities();
   }
 };
 </script>
