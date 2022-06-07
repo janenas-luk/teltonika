@@ -1,6 +1,9 @@
 <template>
   <div>
-    <Name name="MIESTAI" />
+    <ul>
+      <h1>ŠALYS</h1>
+      <button class="button">+</button>
+    </ul>
     <Search />
     <div class="border">
       <table class="table is-hoverable">
@@ -45,14 +48,12 @@
 </template>
 
 <script>
-import Name from "../common/Name.vue";
 import Search from "../common/Search.vue";
 import axios from "axios";
 
 export default {
   name: "Cities",
   components: {
-    Name,
     Search
   },
 
@@ -60,14 +61,14 @@ export default {
     return {
       cities: [],
       cityNumber: this.$route.params.id,
-      pageNumber: 1
+      pageNumber: ""
     };
   },
 
   methods: {
-    getCities() {
+    async getCities() {
       try {
-        const response = axios
+        const response = await axios
           .get(
             "https://akademija.teltonika.lt\/countries_api\/api\/countries/" +
               this.cityNumber +
@@ -110,5 +111,17 @@ table th {
   background: #ffffff;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
+}
+.button {
+  font-size: 15px;
+  border-radius: 100%;
+  margin-left: 15px;
+}
+ul {
+  display: flex;
+  align-items: center;
+}
+h1 {
+  font-size: 64px;
 }
 </style>

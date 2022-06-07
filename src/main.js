@@ -1,14 +1,7 @@
 import Vue from "vue";
 import App from "./App.vue";
-import VueRouter from "vue-router";
-import routes from "./routes/routes";
-
-Vue.use(VueRouter);
-
-const router = new VueRouter({
-  routes,
-  mode: "history"
-});
+import "regenerator-runtime/runtime.js";
+import router from "./router";
 
 new Vue({
   router,
