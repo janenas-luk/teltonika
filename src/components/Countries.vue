@@ -11,16 +11,27 @@
       @close-AddCountry="closeAddCountry"
       @reloadAddCountry="getCountries"
     />
-    <Search />
+    <ul class="searchBox">
+      <div>
+        <input class="input" type="text" v-model="search" />
+      </div>
+
+      <div class="select">
+        <select>
+          <option>DATA FILTER</option>
+          <option>ADD DATE</option>
+        </select>
+      </div>
+    </ul>
     <div class="border">
       <table class="table is-hoverable">
         <thead>
           <tr>
-            <th><abbr title="Position">PAVADINIMAS</abbr></th>
-            <th><abbr title="Played">UŽIMAMAS PLOTAS</abbr></th>
-            <th><abbr title="Won">GYVENTOJŲ SKAIČIUS</abbr></th>
-            <th><abbr title="Drawn">ŠALIES TEL. KODAS</abbr></th>
-            <th><abbr title="Lost">VEIKSMAI</abbr></th>
+            <th><abbr title="name">PAVADINIMAS</abbr></th>
+            <th><abbr title="area">UŽIMAMAS PLOTAS</abbr></th>
+            <th><abbr title="population">GYVENTOJŲ SKAIČIUS</abbr></th>
+            <th><abbr title="phone_code">ŠALIES TEL. KODAS</abbr></th>
+            <th><abbr title="toDo">VEIKSMAI</abbr></th>
           </tr>
         </thead>
         <tbody>
@@ -34,30 +45,32 @@
             <td>{{ country.attributes.population }}</td>
             <td>{{ country.attributes.phone_code }}</td>
 
-            <td>
-              <button @click="openDeleteCountry">Delete</button>
-              <delete-country
-                :class="{ 'is-active': deleteCountryActive }"
-                @close-DeleteCountry="closeDeleteCountry"
-                @reloadDeleteCountry="getCountries"
-                :name="country.attributes.name"
-                :countryId="country.id"
-              ></delete-country>
-              |
-              <button @click="openEditCountry">Edit</button>
-              <edit-country
-                :class="{ 'is-active': editCountryActive }"
-                @close-EditCountry="closeEditCountry"
-                @reloadEditCountry="getCountries"
-                :name="country.attributes.name"
-                :area="country.attributes.area"
-                :population="country.attributes.population"
-                :phone_code="country.attributes.phone_code"
-                :countryId="country.id"
-              />
+            <td class="icons">
+              <i
+                class="fa-solid fa-trash solid1"
+                @click="openDeleteCountry(country.id)"
+              ></i>
+              <i
+                class="fa-solid fa-pencil solid2"
+                @click="openEditCountry(country.id)"
+              ></i>
             </td>
           </tr>
         </tbody>
+        <delete-country
+          :class="{ 'is-active': deleteCountryActive }"
+          @close-DeleteCountry="closeDeleteCountry"
+          @reloadDeleteCountry="getCountries"
+          :key="countryId"
+          :countryId="countryId"
+        />
+        <edit-country
+          :class="{ 'is-active': editCountryActive }"
+          @close-EditCountry="closeEditCountry"
+          @reloadEditCountry="getCountries"
+          :key="countryId + 'i'"
+          :countryId="countryId"
+        ></edit-country>
       </table>
     </div>
 
@@ -95,11 +108,14 @@ export default {
 
   data() {
     return {
-      countries: [],
+      countries: {},
       pageNumber: "",
       addCountryActive: false,
       editCountryActive: false,
-      deleteCountryActive: false
+      deleteCountryActive: false,
+      countryId: 97,
+      deleteCountryId: 97,
+      search: ""
     };
   },
 
@@ -111,8 +127,9 @@ export default {
             "https://akademija.teltonika.lt\/countries_api\/api\/countries?page=" +
               this.pageNumber
           )
-          .then(response => (this.countries = response.data))
-          .then(response => (console.log(response.data)))
+          .then(response => {
+            this.countries = response.data;
+          });
       } catch (error) {
         console.log(error);
       }
@@ -123,24 +140,27 @@ export default {
     },
     openAddCountry() {
       this.addCountryActive = true;
+      this.$toasted.global.success();
     },
     closeAddCountry() {
       this.addCountryActive = false;
+      this.$toasted.global.error();
     },
-    openEditCountry() {
+    openEditCountry(id) {
       this.editCountryActive = true;
+      this.countryId = id;
     },
     closeEditCountry() {
       this.editCountryActive = false;
     },
-    openDeleteCountry() {
+    openDeleteCountry(id) {
       this.deleteCountryActive = true;
+      this.countryId = id;
     },
     closeDeleteCountry() {
       this.deleteCountryActive = false;
     }
   },
-
   created() {
     this.getCountries();
   }
@@ -167,6 +187,7 @@ table th {
   background: #ffffff;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
+  margin-bottom: 15px;
 }
 .button {
   font-size: 15px;
@@ -179,5 +200,28 @@ ul {
 }
 h1 {
   font-size: 64px;
+}
+.icons {
+  font-size: 20px;
+  text-align: center;
+}
+.fa-solid {
+  cursor: pointer;
+}
+.solid2 {
+  margin-left: 30px;
+}
+.searchBox {
+  margin-bottom: 20px;
+}
+.input {
+  width: 1050px;
+  margin-right: 30px;
+  background: url("/src/assets/search-icon.svg") no-repeat 1000px;
+  background-size: 20px 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.select {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 </style>

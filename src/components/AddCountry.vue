@@ -9,23 +9,30 @@
       <section class="modal-card-body">
         <div class="field">
           <label class="label">Pavadinimas</label>
-          <input class="input" v-model="name" type="text" />
+          <input class="input" v-model="name" type="text" required />
         </div>
         <div class="field">
           <label class="label">Užimamas plotas</label>
-          <input class="input" v-model="area" type="number" />
+          <input class="input" v-model="area" type="number" min="0" required />
         </div>
         <div class="field">
           <label class="label">Gyventojų skaičius</label>
-          <input class="input" v-model="population" type="number" />
+          <input
+            class="input"
+            v-model="population"
+            type="number"
+            min="0"
+            required
+          />
         </div>
         <div class="field">
           <label class="label">Šalies Tel. kodas</label>
-          <input class="input" v-model="phone_code" type="number" />
+
+          <input class="input" v-model="phone_code" type="tel" required />
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" @click="submitForm">
+        <button class="button" @click="addCountry">
           SAUGOTI
         </button>
       </footer>
@@ -36,17 +43,18 @@
 <script>
 import axios from "axios";
 export default {
+  name: "AddCountry",
   data() {
     return {
-      name: undefined,
-      area: undefined,
-      population: undefined,
-      phone_code: undefined
+      name: "",
+      area: "",
+      population: "",
+      phone_code: ""
     };
   },
   methods: {
-    submitForm() {
-      axios
+    async addCountry() {
+      const response = await axios
         .post("https://akademija.teltonika.lt/countries_api/api/countries", {
           data: {
             attributes: {
@@ -63,12 +71,13 @@ export default {
     closeAddCountry() {
       this.resetFields();
       this.$emit("close-AddCountry");
+      this.$toasted.show('Hello');
     },
     resetFields() {
-      this.name = undefined;
-      this.area = undefined;
-      this.population = undefined;
-      this.phone_code = undefined;
+      this.name = "";
+      this.area = "";
+      this.population = "";
+      this.phone_code = "";
     }
   }
 };

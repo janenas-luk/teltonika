@@ -9,23 +9,23 @@
       <section class="modal-card-body">
         <div class="field">
           <label class="label">Pavadinimas</label>
-          <input class="input" v-model="editName" type="text" />
+          <input class="input" v-model="country.name" type="text" />
         </div>
         <div class="field">
           <label class="label">Užimamas plotas</label>
-          <input class="input" v-model="editArea" type="number" />
+          <input class="input" v-model="country.area" type="number" />
         </div>
         <div class="field">
           <label class="label">Gyventojų skaičius</label>
-          <input class="input" v-model="editPopulation" type="number" />
+          <input class="input" v-model="country.population" type="number" />
         </div>
         <div class="field">
           <label class="label">Šalies Tel. kodas</label>
-          <input class="input" v-model="editPhone" type="number" />
+          <input class="input" v-model="country.phone_code" type="tel" />
         </div>
       </section>
       <footer class="modal-card-foot">
-        <button class="button" @click="submitForm">
+        <button class="button" @click="updateCountry">
           SAUGOTI
         </button>
       </footer>
@@ -36,39 +36,49 @@
 <script>
 import axios from "axios";
 export default {
-  props: ["name", "area", "population", "phone_code", "countryId"],
+  name: "EditCountry",
+  props: ["countryId"],
   data() {
     return {
-      editName: this.name,
-      editArea: this.area,
-      editPopulation: this.population,
-      editPhone: this.phone_code
+      country: {}
     };
   },
   methods: {
-    submitForm() {
-      axios
+    async getEditCountryInfo() {
+      const response = await axios
+        .get(
+          "https://akademija.teltonika.lt/countries_api/api/countries/" +
+            this.countryId
+        )
+        .then(response => (this.country = response.data.data.attributes));
+    },
+    async updateCountry() {
+      const response = await axios
         .put(
           "https://akademija.teltonika.lt/countries_api/api/countries/" +
             this.countryId,
           {
             data: {
               attributes: {
-                name: this.editName,
-                area: this.editArea,
-                population: this.editPopulation,
-                phone_code: this.editPhone
+                name: this.country.name,
+                area: this.country.area,
+                population: this.country.population,
+                phone_code: this.country.phone_code
               }
             }
           }
         )
-        .then(() => console.log(this.countryId))
         .then(() => this.$emit("reloadEditCountry"))
         .then(() => this.closeEditCountry());
     },
     closeEditCountry() {
       this.$emit("close-EditCountry");
     }
+  },
+  created() {
+    this.getEditCountryInfo();
   }
 };
 </script>
+
+<style></style>

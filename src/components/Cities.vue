@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul>
-      <h1>ŠALYS</h1>
+      <h1>MIESTAI</h1>
       <button class="button">+</button>
     </ul>
     <Search />
