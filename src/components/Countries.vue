@@ -2,9 +2,7 @@
   <div>
     <ul>
       <h1>ŠALYS</h1>
-      <button class="button" @click="openAddCountry">
-        +
-      </button>
+      <button class="button" @click="openAddCountry">+</button>
     </ul>
     <add-country
       :class="{ 'is-active': addCountryActive }"
@@ -12,14 +10,10 @@
       @reloadAddCountry="getCountries"
     />
     <ul class="searchBox">
-      <div>
-        <input class="input" type="text" v-model="search" />
-      </div>
-
+      <input class="input" type="text" v-model="search" @input="getCountries" />
       <div class="select">
-        <select>
+        <select class="select">
           <option>DATA FILTER</option>
-          <option>ADD DATE</option>
         </select>
       </div>
     </ul>
@@ -46,14 +40,8 @@
             <td>{{ country.attributes.phone_code }}</td>
 
             <td class="icons">
-              <i
-                class="fa-solid fa-trash solid1"
-                @click="openDeleteCountry(country.id)"
-              ></i>
-              <i
-                class="fa-solid fa-pencil solid2"
-                @click="openEditCountry(country.id)"
-              ></i>
+              <i class="fa-solid fa-trash solid1" @click="openDeleteCountry(country.id)"></i>
+              <i class="fa-solid fa-pencil solid2" @click="openEditCountry(country.id)"></i>
             </td>
           </tr>
         </tbody>
@@ -81,9 +69,9 @@
             @click="setPageNumber(link.url.slice(-1))"
             class="pagination-link"
             :class="{ 'is-current': link.active }"
-            aria-label="Goto page"
-            >{{ link.label }}</a
-          >
+            >
+            {{ link.label }}
+          </a>
         </li>
       </ul>
     </nav>
@@ -91,7 +79,6 @@
 </template>
 
 <script>
-import Search from "../common/Search.vue";
 import axios from "axios";
 import AddCountry from "./AddCountry.vue";
 import EditCountry from "./EditCountry.vue";
@@ -100,7 +87,6 @@ import DeleteCountry from "./DeleteCountry.vue";
 export default {
   name: "Countries",
   components: {
-    Search,
     AddCountry,
     EditCountry,
     DeleteCountry
@@ -114,24 +100,21 @@ export default {
       editCountryActive: false,
       deleteCountryActive: false,
       countryId: 97,
-      deleteCountryId: 97,
-      search: ""
+      deleteCountryId: "",
+      search: "",
+      url: "https://akademija.teltonika.lt\/countries_api\/api\/countries"
     };
   },
-
   methods: {
     async getCountries() {
       try {
         const response = await axios
-          .get(
-            "https://akademija.teltonika.lt\/countries_api\/api\/countries?page=" +
-              this.pageNumber
-          )
-          .then(response => {
-            this.countries = response.data;
-          });
+          .get(this.url + "?page=" + this.pageNumber + "&search=" + this.search)
+          .then(response => {this.countries = response.data});
       } catch (error) {
-        console.log(error);
+        this.$toasted.global.error({
+          message: "Error fetching data!"
+        });
       }
     },
     setPageNumber(value) {
@@ -140,11 +123,9 @@ export default {
     },
     openAddCountry() {
       this.addCountryActive = true;
-      this.$toasted.global.success();
     },
     closeAddCountry() {
       this.addCountryActive = false;
-      this.$toasted.global.error();
     },
     openEditCountry(id) {
       this.editCountryActive = true;

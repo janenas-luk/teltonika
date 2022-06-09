@@ -2,9 +2,24 @@
   <div>
     <ul>
       <h1>MIESTAI</h1>
-      <button class="button">+</button>
+      <button class="button" @click="openAddCity">+</button>
     </ul>
-    <Search />
+    <add-city
+      :class="{ 'is-active': addCityActive }"
+      @close-AddCity="closeAddCity"
+      @reloadAddCity="getCities"
+      :countryId="countryId"
+    />
+    <ul class="searchBox">
+      <div>
+        <input class="input" type="text" v-model="search" @input="getCities" />
+      </div>
+      <div class="select">
+        <select>
+          <option>DATA FILTER</option>
+        </select>
+      </div>
+    </ul>
     <div class="border">
       <table class="table is-hoverable">
         <thead>
@@ -25,13 +40,34 @@
             <td>{{ city.attributes.population }}</td>
             <td>{{ city.attributes.postal_code }}</td>
 
-            <td>Delete | Edit</td>
+            <td class="icons">
+              <i class="fa-solid fa-trash solid1" @click="openDeleteCity(city.id)"></i>
+              <i class="fa-solid fa-pencil solid2" @click="openEditCity(city.id)"></i>
+            </td>
           </tr>
         </tbody>
+        <delete-city
+          :class="{ 'is-active': deleteCityActive }"
+          @close-DeleteCity="closeDeleteCity"
+          @reloadDeleteCity="getCities"
+          :key="cityId"
+          :cityId="cityId"
+          :countryId="countryId"
+          :deleteCityActive="deleteCityActive"
+        />
+        <edit-city
+          :class="{ 'is-active': editCityActive }"
+          @close-EditCity="closeEditCity"
+          @reloadEditCity="getCities"
+          :key="cityId + 'i'"
+          :cityId="cityId"
+          :countryId="countryId"
+          :editCityActive="editCityActive"
+        ></edit-city>
       </table>
     </div>
 
-    <nav class="pagination is-centered is-small" v-if="cities.data.length > 10">
+    <nav class="pagination is-centered is-small">
       <ul class="pagination-list">
         <li v-for="link in cities.meta.links" :key="link.label">
           <a
@@ -39,8 +75,9 @@
             class="pagination-link"
             :class="{ 'is-current': link.active }"
             aria-label="Goto page"
-            >{{ link.label }}</a
-          >
+            >
+            {{ link.label }}
+          </a>
         </li>
       </ul>
     </nav>
@@ -48,20 +85,30 @@
 </template>
 
 <script>
-import Search from "../common/Search.vue";
+import AddCity from "./AddCity.vue";
+import EditCity from "./EditCity.vue";
+import DeleteCity from "./DeleteCity.vue";
 import axios from "axios";
 
 export default {
   name: "Cities",
   components: {
-    Search
+    AddCity,
+    EditCity,
+    DeleteCity
   },
 
   data() {
     return {
       cities: [],
-      cityNumber: this.$route.params.id,
-      pageNumber: ""
+      countryId: this.$route.params.id,
+      pageNumber: "",
+      addCityActive: false,
+      editCityActive: false,
+      deleteCityActive: false,
+      search: "",
+      cityId: "",
+      url: 'https://akademija.teltonika.lt/countries_api/api/countries/'
     };
   },
 
@@ -69,20 +116,37 @@ export default {
     async getCities() {
       try {
         const response = await axios
-          .get(
-            "https://akademija.teltonika.lt\/countries_api\/api\/countries/" +
-              this.cityNumber +
-              "/cities?page=" +
-              this.pageNumber
-          )
+          .get(this.url + this.countryId + "/cities?page=" + this.pageNumber + "&search=" + this.search)
           .then(response => (this.cities = response.data));
       } catch (error) {
-        console.log(error);
+        this.$toasted.global.error({
+          message: "Error fetching data!"
+        });
       }
     },
     setCityPage(value) {
       this.pageNumber = value;
       this.getCities();
+    },
+    openAddCity() {
+      this.addCityActive = true;
+    },
+    closeAddCity() {
+      this.addCityActive = false;
+    },
+    openEditCity(id) {
+      this.editCityActive = true;
+      this.cityId = id;
+    },
+    closeEditCity() {
+      this.editCityActive = false;
+    },
+    openDeleteCity(id) {
+      this.deleteCityActive = true;
+      this.cityId = id;
+    },
+    closeDeleteCity() {
+      this.deleteCityActive = false;
     }
   },
   created() {
@@ -123,5 +187,28 @@ ul {
 }
 h1 {
   font-size: 64px;
+}
+.icons {
+  font-size: 20px;
+  text-align: center;
+}
+.fa-solid {
+  cursor: pointer;
+}
+.solid2 {
+  margin-left: 30px;
+}
+.searchBox {
+  margin-bottom: 20px;
+}
+.input {
+  width: 1050px;
+  margin-right: 30px;
+  background: url("/src/assets/search-icon.svg") no-repeat 1000px;
+  background-size: 20px 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.select {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 </style>

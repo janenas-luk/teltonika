@@ -6,24 +6,23 @@ import Toasted from "vue-toasted";
 
 Vue.use(Toasted);
 
-Vue.toasted.register('success', 'Success', {
-  duration: 2500,
-  position: "top-center",
-  theme: "bubble",
-  type: 'success'
-});
-Vue.toasted.register('error', 'Error', {
-  duration: 2500,
-  position: "top-center",
-  theme: "bubble",
-  type: 'error'
-});
-
-
-
-
 new Vue({
   router,
   el: "#app",
   render: h => h(App)
 });
+
+Vue.toasted.register(
+  "success",
+  payload => {
+    return payload.message;
+  },
+  { duration: 2500, position: "top-center", theme: "bubble", type: "success" }
+);
+Vue.toasted.register(
+  "error",
+  payload => {
+    return "Oops.. " + payload.message;
+  },
+  { duration: 2500, position: "top-center", theme: "bubble", type: "error" }
+);
