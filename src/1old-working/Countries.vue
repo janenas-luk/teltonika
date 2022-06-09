@@ -4,12 +4,10 @@
       <h1>ŠALYS</h1>
       <button class="button" @click="openAddCountry">+</button>
     </ul>
-    <add
+    <add-country
       :class="{ 'is-active': addCountryActive }"
-      @close="closeAddCountry"
-      @refresh="getCountries"
-      :settings="settings"
-      :salis="true"
+      @close-AddCountry="closeAddCountry"
+      @reloadAddCountry="getCountries"
     />
     <ul class="searchBox">
       <input class="input" type="text" v-model="search" @input="getCountries" />
@@ -47,24 +45,20 @@
             </td>
           </tr>
         </tbody>
-        <delete
+        <delete-country
           :class="{ 'is-active': deleteCountryActive }"
-          @close="closeDeleteCountry"
-          @refresh="getCountries"
+          @close-DeleteCountry="closeDeleteCountry"
+          @reloadDeleteCountry="getCountries"
           :key="countryId"
           :countryId="countryId"
-          :settings="settings"
-          :salis="true"
         />
-        <edit
+        <edit-country
           :class="{ 'is-active': editCountryActive }"
-          @close="closeEditCountry"
-          @refresh="getCountries"
+          @close-EditCountry="closeEditCountry"
+          @reloadEditCountry="getCountries"
           :key="countryId + 'i'"
           :countryId="countryId"
-          :settings="settings"
-          :salis="true"
-        ></edit>
+        ></edit-country>
       </table>
     </div>
 
@@ -75,7 +69,9 @@
             @click="setPageNumber(link.url.slice(-1))"
             class="pagination-link"
             :class="{ 'is-current': link.active }"
-          > {{ link.label }} </a>
+            >
+            {{ link.label }}
+          </a>
         </li>
       </ul>
     </nav>
@@ -84,28 +80,20 @@
 
 <script>
 import axios from "axios";
-import Add from "./Add.vue";
-import Edit from "./Edit.vue";
-import Delete from "./Delete.vue";
+import AddCountry from "./AddCountry.vue";
+import EditCountry from "./EditCountry.vue";
+import DeleteCountry from "./DeleteCountry.vue";
 
 export default {
   name: "Countries",
   components: {
-    Add,
-    Edit,
-    Delete
+    AddCountry,
+    EditCountry,
+    DeleteCountry
   },
+
   data() {
     return {
-      settings: {
-        prideti: "PRIDĖTI ŠALĮ",
-        pavadinimas: "Pavadinimas",
-        plotas: "Užimamas plotas",
-        gyventojai: "Gyventojų skaičius",
-        kodas: "Šalies Tel. kodas",
-        url: "https://akademija.teltonika.lt/countries_api/api/countries",
-        redaguoti: "REDAGUOTI ŠALĮ"
-      },
       countries: {},
       pageNumber: "",
       addCountryActive: false,
@@ -122,9 +110,7 @@ export default {
       try {
         const response = await axios
           .get(this.url + "?page=" + this.pageNumber + "&search=" + this.search)
-          .then(response => {
-            this.countries = response.data;
-          });
+          .then(response => {this.countries = response.data});
       } catch (error) {
         this.$toasted.global.error({
           message: "Error fetching data!"

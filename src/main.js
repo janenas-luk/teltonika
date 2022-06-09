@@ -4,7 +4,6 @@ import "regenerator-runtime/runtime.js";
 import router from "./router";
 import Toasted from "vue-toasted";
 
-Vue.use(Toasted);
 
 new Vue({
   router,
@@ -12,6 +11,7 @@ new Vue({
   render: h => h(App)
 });
 
+Vue.use(Toasted);
 Vue.toasted.register(
   "success",
   payload => {

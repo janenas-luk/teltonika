@@ -17,8 +17,7 @@ export default new Router({
       path: "/Cities/:id",
       component: Cities,
       name: "Cities"
-    },
-
+    }
   ],
   mode: "history"
 });

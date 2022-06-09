@@ -4,13 +4,11 @@
       <h1>MIESTAI</h1>
       <button class="button" @click="openAddCity">+</button>
     </ul>
-    <add
+    <add-city
       :class="{ 'is-active': addCityActive }"
-      @close="closeAddCity"
-      @refresh="getCities"
+      @close-AddCity="closeAddCity"
+      @reloadAddCity="getCities"
       :countryId="countryId"
-      :settings="settings"
-      :salis="false"
     />
     <ul class="searchBox">
       <div>
@@ -26,16 +24,18 @@
       <table class="table is-hoverable">
         <thead>
           <tr>
-            <th><abbr title="name">PAVADINIMAS</abbr></th>
-            <th><abbr title="area">UŽIMAMAS PLOTAS</abbr></th>
-            <th><abbr title="population">GYVENTOJŲ SKAIČIUS</abbr></th>
-            <th><abbr title="postal_code">MIESTO PAŠTO KODAS</abbr></th>
-            <th><abbr title="toDo">VEIKSMAI</abbr></th>
+            <th><abbr title="Position">PAVADINIMAS</abbr></th>
+            <th><abbr title="Played">UŽIMAMAS PLOTAS</abbr></th>
+            <th><abbr title="Won">GYVENTOJŲ SKAIČIUS</abbr></th>
+            <th><abbr title="Drawn">MIESTO PAŠTO KODAS</abbr></th>
+            <th><abbr title="Lost">VEIKSMAI</abbr></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="city in cities.data" v-bind:key="city.id">
-            <td>{{ city.attributes.name }}</td>
+            <td>
+              {{ city.attributes.name }}
+            </td>
             <td>{{ city.attributes.area }}</td>
             <td>{{ city.attributes.population }}</td>
             <td>{{ city.attributes.postal_code }}</td>
@@ -46,38 +46,38 @@
             </td>
           </tr>
         </tbody>
-        <delete
+        <delete-city
           :class="{ 'is-active': deleteCityActive }"
-          @close="closeDeleteCity"
-          @refresh="getCities"
+          @close-DeleteCity="closeDeleteCity"
+          @reloadDeleteCity="getCities"
           :key="cityId"
           :cityId="cityId"
           :countryId="countryId"
           :deleteCityActive="deleteCityActive"
-          :settings="settings"
-          :salis="false"
         />
-        <edit
+        <edit-city
           :class="{ 'is-active': editCityActive }"
-          @close="closeEditCity"
-          @refresh="getCities"
+          @close-EditCity="closeEditCity"
+          @reloadEditCity="getCities"
           :key="cityId + 'i'"
           :cityId="cityId"
           :countryId="countryId"
           :editCityActive="editCityActive"
-          :settings="settings"
-          :salis="false"
-        />
+        ></edit-city>
       </table>
     </div>
+
     <nav class="pagination is-centered is-small">
       <ul class="pagination-list">
         <li v-for="link in cities.meta.links" :key="link.label">
-          <a @click="setCityPage(link.url.slice(-1))"
+          <a
+            @click="setCityPage(link.url.slice(-1))"
             class="pagination-link"
             :class="{ 'is-current': link.active }"
             aria-label="Goto page"
-            > {{ link.label }} </a>
+            >
+            {{ link.label }}
+          </a>
         </li>
       </ul>
     </nav>
@@ -85,29 +85,21 @@
 </template>
 
 <script>
-import Add from "./Add.vue";
-import Edit from "./Edit.vue";
-import Delete from "./Delete.vue";
+import AddCity from "./AddCity.vue";
+import EditCity from "./EditCity.vue";
+import DeleteCity from "./DeleteCity.vue";
 import axios from "axios";
 
 export default {
   name: "Cities",
   components: {
-    Add,
-    Edit,
-    Delete
+    AddCity,
+    EditCity,
+    DeleteCity
   },
 
   data() {
     return {
-      settings: {
-        prideti: "PRIDĖTI MIESTĄ",
-        pavadinimas: "Pavadinimas",
-        plotas: "Užimamas plotas",
-        gyventojai: "Gyventojų skaičius",
-        kodas: "Miesto pašto kodas",
-        url: "https://akademija.teltonika.lt/countries_api/api/countries"
-      },
       cities: [],
       countryId: this.$route.params.id,
       pageNumber: "",
@@ -116,20 +108,16 @@ export default {
       deleteCityActive: false,
       search: "",
       cityId: "",
-      url: "https://akademija.teltonika.lt/countries_api/api/countries/"
+      url: 'https://akademija.teltonika.lt/countries_api/api/countries/'
     };
   },
+
   methods: {
     async getCities() {
       try {
-        const response = await axios.get(
-            this.url +
-              this.countryId +
-              "/cities?page=" +
-              this.pageNumber +
-              "&search=" +
-              this.search
-          ).then(response => (this.cities = response.data));
+        const response = await axios
+          .get(this.url + this.countryId + "/cities?page=" + this.pageNumber + "&search=" + this.search)
+          .then(response => (this.cities = response.data));
       } catch (error) {
         this.$toasted.global.error({
           message: "Error fetching data!"
